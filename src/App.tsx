@@ -126,40 +126,41 @@ export default function App() {
 
   return (
     <>
-      <header className="wrap hero">
-        <span className="dot" style={{ background: sheet.accent }} />
-        <h1>Cheat Sheets</h1>
-        <span className="spacer" />
-        <button
-          className="icon-btn"
-          onClick={() => setSize((n) => Math.max(0, n - 1))}
-          disabled={size === 0}
-          aria-label="Smaller text"
-          title="Smaller text"
-        >
-          A−
-        </button>
-        <button
-          className="icon-btn"
-          onClick={() => setSize((n) => Math.min(SIZES.length - 1, n + 1))}
-          disabled={size === SIZES.length - 1}
-          aria-label="Bigger text"
-          title="Bigger text"
-        >
-          A+
-        </button>
-        <button
-          className="icon-btn"
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-          title="Theme"
-        >
-          {theme === 'dark' ? '☀' : '☾'}
-        </button>
-      </header>
+      <div className="topbar">
+        <header className="wrap hero">
+          <span className="dot" style={{ background: sheet.accent }} />
+          <h1>Cheat Sheets</h1>
+          <span className="spacer" />
+          <button
+            className="icon-btn"
+            onClick={() => setSize((n) => Math.max(0, n - 1))}
+            disabled={size === 0}
+            aria-label="Smaller text"
+            title="Smaller text"
+          >
+            A−
+          </button>
+          <button
+            className="icon-btn"
+            onClick={() => setSize((n) => Math.min(SIZES.length - 1, n + 1))}
+            disabled={size === SIZES.length - 1}
+            aria-label="Bigger text"
+            title="Bigger text"
+          >
+            A+
+          </button>
+          <button
+            className="icon-btn"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            title="Theme"
+          >
+            {theme === 'dark' ? '☀' : '☾'}
+          </button>
+        </header>
 
-      <div className="bar">
         <TabBar sheets={sheets} activeId={activeId} onSelect={selectTab} />
+
         <div className="search-row">
           <label className="search">
             <svg
