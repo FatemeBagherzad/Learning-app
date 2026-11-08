@@ -11,6 +11,11 @@ const K_TAB = 'activeTab'
 const K_SCROLL = 'scroll'
 const K_THEME = 'theme'
 const K_CLOSED = 'closed'
+const K_SIZE = 'textSize'
+
+/** Root font size in px — every text size in the app is rem-based, so this scales all of it. */
+const SIZES = [15, 17, 19, 21, 23]
+const DEFAULT_SIZE = 1 // 17px: comfortable on a phone, and the same on a desktop
 
 function initialTab(): string {
   const saved = load<string>(K_TAB, '')
@@ -20,15 +25,18 @@ function initialTab(): string {
 function initialTheme(): Theme {
   const saved = load<Theme | ''>(K_THEME, '')
   if (saved === 'dark' || saved === 'light') return saved
-  const prefersLight =
-    typeof window !== 'undefined' &&
-    window.matchMedia?.('(prefers-color-scheme: light)').matches === true
-  return prefersLight ? 'light' : 'dark'
+  return 'light' // the OPS palette is a light one; dark is there if you want it
+}
+
+function initialSize(): number {
+  const saved = load<number>(K_SIZE, DEFAULT_SIZE)
+  return Number.isInteger(saved) && saved >= 0 && saved < SIZES.length ? saved : DEFAULT_SIZE
 }
 
 export default function App() {
   const [activeId, setActiveId] = useState(initialTab)
   const [theme, setTheme] = useState<Theme>(initialTheme)
+  const [size, setSize] = useState<number>(initialSize)
   const [query, setQuery] = useState('')
   const [closed, setClosed] = useState<ClosedMap>(() => load<ClosedMap>(K_CLOSED, {}))
   const [showTop, setShowTop] = useState(false)
@@ -43,6 +51,12 @@ export default function App() {
       ?.setAttribute('content', theme === 'light' ? '#f6f7fa' : '#0f1115')
     save(K_THEME, theme)
   }, [theme])
+
+  /* ---- text size ---- */
+  useEffect(() => {
+    document.documentElement.style.setProperty('--root-size', `${SIZES[size]}px`)
+    save(K_SIZE, size)
+  }, [size])
 
   /* ---- remember the open tab ---- */
   useEffect(() => {
@@ -118,6 +132,24 @@ export default function App() {
         <span className="spacer" />
         <button
           className="icon-btn"
+          onClick={() => setSize((n) => Math.max(0, n - 1))}
+          disabled={size === 0}
+          aria-label="Smaller text"
+          title="Smaller text"
+        >
+          A−
+        </button>
+        <button
+          className="icon-btn"
+          onClick={() => setSize((n) => Math.min(SIZES.length - 1, n + 1))}
+          disabled={size === SIZES.length - 1}
+          aria-label="Bigger text"
+          title="Bigger text"
+        >
+          A+
+        </button>
+        <button
+          className="icon-btn"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
           title="Theme"
@@ -170,7 +202,10 @@ export default function App() {
         />
       </main>
 
-      <p className="foot">Tap a heading to fold it · your tab, place and folds are remembered</p>
+      <p className="foot">
+        Tap a heading to fold it · A− / A+ resize the text · your tab, place, folds and size are
+        remembered
+      </p>
 
       {showTop && (
         <button

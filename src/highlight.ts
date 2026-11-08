@@ -25,6 +25,16 @@ const KEYWORDS: Record<Lang, string[]> = {
     'try', 'type', 'typeof', 'unknown', 'var', 'void', 'while', 'yield',
     'null', 'undefined', 'true', 'false',
   ],
+  sql: [
+    'ADD', 'ALL', 'ALTER', 'AND', 'ANY', 'AS', 'ASC', 'BEGIN', 'BETWEEN', 'BY', 'CASE', 'CAST',
+    'CHECK', 'COLUMN', 'COMMIT', 'CONSTRAINT', 'CREATE', 'CROSS', 'DATABASE', 'DEFAULT', 'DELETE',
+    'DESC', 'DISTINCT', 'DROP', 'ELSE', 'END', 'EXCEPT', 'EXISTS', 'FALSE', 'FETCH', 'FOREIGN',
+    'FROM', 'FULL', 'GROUP', 'HAVING', 'IF', 'ILIKE', 'IN', 'INDEX', 'INNER', 'INSERT', 'INTERSECT',
+    'INTO', 'IS', 'JOIN', 'KEY', 'LEFT', 'LIKE', 'LIMIT', 'NOT', 'NULL', 'OFFSET', 'ON', 'OR',
+    'ORDER', 'OUTER', 'OVER', 'PARTITION', 'PRIMARY', 'REFERENCES', 'RETURNING', 'RIGHT',
+    'ROLLBACK', 'SELECT', 'SET', 'TABLE', 'THEN', 'TRANSACTION', 'TRUE', 'UNION', 'UNIQUE',
+    'UPDATE', 'USING', 'VALUES', 'VIEW', 'WHEN', 'WHERE', 'WITH',
+  ],
   shell: ['cd', 'export', 'if', 'then', 'fi', 'for', 'do', 'done', 'source'],
 }
 
@@ -45,6 +55,12 @@ const BUILTINS: Record<Lang, string[]> = {
     'Readonly', 'Record', 'Required', 'ReturnType', 'Parameters', 'NonNullable', 'InstanceType',
     'Map', 'Set', 'Object', 'String', 'Number', 'console', 'JSON', 'string', 'number', 'boolean',
     'object', 'symbol', 'bigint',
+  ],
+  sql: [
+    'AVG', 'COALESCE', 'CONCAT', 'COUNT', 'CURRENT_DATE', 'DATE', 'DENSE_RANK', 'EXTRACT',
+    'GREATEST', 'INTEGER', 'LAG', 'LEAD', 'LEAST', 'LENGTH', 'LOWER', 'MAX', 'MIN', 'NOW',
+    'NULLIF', 'NUMERIC', 'RANK', 'ROUND', 'ROW_NUMBER', 'SERIAL', 'SUBSTRING', 'SUM', 'TEXT',
+    'TIMESTAMP', 'TRIM', 'UPPER', 'VARCHAR', 'BOOLEAN',
   ],
   shell: ['npm', 'npx', 'node', 'pip', 'python', 'uv', 'git'],
 }
@@ -69,6 +85,16 @@ function rulesFor(lang: Lang): Rule[] {
       { kind: 'fn', re: /[A-Za-z_]\w*(?=\s*\()/y },
       { kind: 'txt', re: /[A-Za-z_]\w*/y },
       { kind: 'op', re: /[+\-*/%=<>!&|^~:?]+/y },
+    ]
+  }
+  if (lang === 'sql') {
+    return [
+      { kind: 'com', re: /--[^\n]*|\/\*[\s\S]*?\*\//y },
+      { kind: 'str', re: /'(?:''|[^'])*'|"(?:""|[^"])*"/y },
+      NUMBER,
+      { kind: 'fn', re: /[A-Za-z_]\w*(?=\s*\()/y },
+      { kind: 'txt', re: /[A-Za-z_]\w*/y },
+      { kind: 'op', re: /[+\-*/%=<>!|^~:?]+/y },
     ]
   }
   if (lang === 'shell') {
@@ -96,6 +122,8 @@ export function tokenize(code: string, lang: Lang): Token[] {
   const rules = rulesFor(lang)
   const keywords = new Set(KEYWORDS[lang])
   const builtins = new Set(BUILTINS[lang])
+  // SQL keywords are case-insensitive; every other language here is not.
+  const fold = (word: string) => (lang === 'sql' ? word.toUpperCase() : word)
   const out: Token[] = []
   let plain = ''
 
@@ -123,8 +151,9 @@ export function tokenize(code: string, lang: Lang): Token[] {
       if (m && m[0].length > 0) {
         let kind = rule.kind
         if (kind === 'txt' || kind === 'fn') {
-          if (keywords.has(m[0])) kind = 'kw'
-          else if (builtins.has(m[0])) kind = 'bul'
+          const word = fold(m[0])
+          if (keywords.has(word)) kind = 'kw'
+          else if (builtins.has(word)) kind = 'bul'
         }
         push(m[0], kind)
         i += m[0].length

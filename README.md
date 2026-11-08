@@ -2,11 +2,17 @@
 
 **Live: [mylearning-app.netlify.app](https://mylearning-app.netlify.app)**
 
-A single-page React + TypeScript app with one scrollable tab per language. Mobile first,
-works just as well on a wide screen. Everything is local — no accounts, no network.
+A single-page React + TypeScript app with one scrollable tab per language — Python, TypeScript,
+JavaScript, React and SQL. Mobile first, works just as well on a wide screen. Everything is
+local — no accounts, no network.
+
+Colours and card styling match the OPS learning app: light background, white-to-pastel cards
+with a coloured left border, one colour per section so you can find your place by eye.
 
 - **Remembers where you were.** The open tab, how far down each sheet you had scrolled,
-  which sections you folded and your theme all survive closing the app.
+  which sections you folded, your theme and your text size all survive closing the app.
+- **A− / A+** in the header resize the whole app (15 → 23px). Phone-comfortable 17px is the
+  default on every device, since all sizes are rem-based.
 - **Search** filters the current sheet as you type.
 - **Fold a section** by tapping its heading.
 - **Copy** any snippet with the button in its corner.
@@ -70,8 +76,12 @@ const sheet: Sheet = {
 ```
 
 `lang` only picks the highlighter, so for a language without its own one, use the closest
-of `python` / `javascript` / `typescript` / `shell`. To add a real highlighter, extend the
-keyword lists and rules in `src/highlight.ts`.
+of `python` / `javascript` / `typescript` / `sql` / `shell` (the React sheet uses
+`typescript`, which covers JSX). To add a real highlighter, extend the keyword lists and
+rules in `src/highlight.ts`.
+
+Section colours are assigned automatically — they cycle through blue, green, violet, orange,
+sky, red and yellow in the order you list the sections, so you never pick one by hand.
 
 ## Layout of the code
 

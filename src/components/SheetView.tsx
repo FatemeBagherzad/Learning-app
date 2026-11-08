@@ -39,9 +39,16 @@ function filter(sections: Section[], query: string): Section[] {
   return out
 }
 
+/** Card colours, cycled per section — same set as the OPS learning app. */
+const TONES = ['blue', 'green', 'violet', 'orange', 'sky', 'red', 'yellow'] as const
+
 export default function SheetView({ sheet, query, closed, onToggle }: Props) {
   const sections = useMemo(() => filter(sheet.sections, query), [sheet, query])
   const searching = query.trim().length > 0
+  // Tone follows the section's place in the full sheet, so a section keeps its
+  // colour while you search.
+  const toneOf = (title: string) =>
+    TONES[sheet.sections.findIndex((s) => s.title === title) % TONES.length]
 
   if (!sections.length) {
     return <p className="empty">Nothing in {sheet.label} matches “{query.trim()}”.</p>
@@ -59,7 +66,7 @@ export default function SheetView({ sheet, query, closed, onToggle }: Props) {
         {sections.map((s) => {
           const open = searching || !closed[s.title]
           return (
-            <section className="card" data-open={open} key={s.title}>
+            <section className="card" data-open={open} data-tone={toneOf(s.title)} key={s.title}>
               <button
                 className="card-head"
                 onClick={() => onToggle(s.title)}
