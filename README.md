@@ -1,5 +1,7 @@
 # Cheat Sheets
 
+**Live: [mylearning-app.netlify.app](https://mylearning-app.netlify.app)**
+
 A single-page React + TypeScript app with one scrollable tab per language. Mobile first,
 works just as well on a wide screen. Everything is local — no accounts, no network.
 
@@ -34,7 +36,10 @@ npm run preview      # check the build locally
 ```
 
 `dist/` is plain static files with relative paths, so it works on GitHub Pages, Netlify,
-Vercel, or any folder on a web server. Open it on the phone once and use
+Vercel, or any folder on a web server.
+
+It is deployed on Netlify at **[mylearning-app.netlify.app](https://mylearning-app.netlify.app)**
+(build command `npm run build`, publish directory `dist`). Open it on the phone once and use
 *Add to Home Screen* — it then opens full screen and works with no signal.
 
 ## Add a tab
