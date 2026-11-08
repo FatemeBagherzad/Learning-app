@@ -6,6 +6,10 @@ A single-page React + TypeScript app with one scrollable tab per subject — AI,
 Docker, Helm, Python, TypeScript, JavaScript, React and SQL. Mobile first, works just as well
 on a wide screen. Everything is local — no accounts, no network.
 
+The AI tab opens with a reference to the Markdown files AI tools read — `AGENTS.md`,
+`CLAUDE.md`, Copilot instructions, Cursor rules and the rest — before it gets to the
+Claude API itself.
+
 Colours and card styling match the OPS learning app: light background, white-to-pastel cards
 with a coloured left border, one colour per section so you can find your place by eye.
 
@@ -97,7 +101,8 @@ sky, red and yellow in the order you list the sections, so you never pick one by
 | `src/highlight.ts` | Dependency-free syntax tokenizer |
 | `src/styles.css` | All styling; colours are CSS variables at the top |
 | `src/data/index.ts` | The list of sheets — this order is the tab order |
-| `src/data/*.ts` | The cheat sheet content |
+| `src/data/*.ts` | The cheat sheet content, one file per tab |
+| `src/data/ai-config-files.ts` | The AI tab's opening sections, spread into `ai.ts` |
 
 Colours live in `:root` (dark) and `html[data-theme='light']` in `src/styles.css` —
 change them in one place and the whole app follows.

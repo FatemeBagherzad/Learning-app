@@ -1,4 +1,5 @@
 import type { Sheet } from '../types'
+import aiConfigFiles from './ai-config-files'
 
 const ai: Sheet = {
   id: 'ai',
@@ -6,6 +7,8 @@ const ai: Sheet = {
   lang: 'python',
   accent: '#7c3aed',
   sections: [
+    // The Markdown/config files every AI tool reads — first cards on the tab.
+    ...aiConfigFiles,
     {
       title: 'Set up & first call',
       blurb: 'Everything goes through one endpoint: POST /v1/messages. Tools, images and JSON output are features of that one call, not separate APIs.',
