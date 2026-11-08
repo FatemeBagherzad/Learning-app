@@ -35,7 +35,14 @@ const KEYWORDS: Record<Lang, string[]> = {
     'ROLLBACK', 'SELECT', 'SET', 'TABLE', 'THEN', 'TRANSACTION', 'TRUE', 'UNION', 'UNIQUE',
     'UPDATE', 'USING', 'VALUES', 'VIEW', 'WHEN', 'WHERE', 'WITH',
   ],
-  shell: ['cd', 'export', 'if', 'then', 'fi', 'for', 'do', 'done', 'source'],
+  yaml: ['true', 'false', 'null', 'yes', 'no', 'on', 'off', 'True', 'False', 'Null', 'None'],
+  shell: [
+    'cd', 'export', 'if', 'then', 'fi', 'else', 'elif', 'for', 'do', 'done', 'while', 'case',
+    'esac', 'function', 'return', 'source', 'set', 'local', 'exit',
+    // Dockerfile instructions live here too: the Docker sheet uses this highlighter.
+    'FROM', 'AS', 'RUN', 'CMD', 'LABEL', 'EXPOSE', 'ENV', 'ADD', 'COPY', 'ENTRYPOINT', 'VOLUME',
+    'USER', 'WORKDIR', 'ARG', 'ONBUILD', 'STOPSIGNAL', 'HEALTHCHECK', 'SHELL', 'MAINTAINER',
+  ],
 }
 
 const BUILTINS: Record<Lang, string[]> = {
@@ -62,7 +69,15 @@ const BUILTINS: Record<Lang, string[]> = {
     'NULLIF', 'NUMERIC', 'RANK', 'ROUND', 'ROW_NUMBER', 'SERIAL', 'SUBSTRING', 'SUM', 'TEXT',
     'TIMESTAMP', 'TRIM', 'UPPER', 'VARCHAR', 'BOOLEAN',
   ],
-  shell: ['npm', 'npx', 'node', 'pip', 'python', 'uv', 'git'],
+  yaml: [
+    'apiVersion', 'kind', 'metadata', 'spec', 'status', 'name', 'namespace', 'labels',
+    'annotations', 'selector', 'template', 'containers', 'image', 'ports', 'env', 'services',
+    'volumes', 'resources', 'replicas',
+  ],
+  shell: [
+    'npm', 'npx', 'node', 'pip', 'python', 'uv', 'git', 'docker', 'kubectl', 'helm', 'kustomize',
+    'curl', 'echo', 'apt-get', 'apk', 'make', 'bash', 'sh', 'minikube', 'kind', 'buildx', 'k9s',
+  ],
 }
 
 type Rule = { kind: Kind; re: RegExp }
@@ -95,6 +110,20 @@ function rulesFor(lang: Lang): Rule[] {
       { kind: 'fn', re: /[A-Za-z_]\w*(?=\s*\()/y },
       { kind: 'txt', re: /[A-Za-z_]\w*/y },
       { kind: 'op', re: /[+\-*/%=<>!|^~:?]+/y },
+    ]
+  }
+  if (lang === 'yaml') {
+    return [
+      // a Go template action ({{ .Values.x | quote }}) is one token — Helm charts
+      { kind: 'dec', re: /\{\{[\s\S]*?\}\}/y },
+      { kind: 'str', re: /"(?:\\.|[^"\\\n])*"|'(?:''|[^'\n])*'/y },
+      { kind: 'com', re: /#[^\n]*/y },
+      // a key is a word sitting right before a colon
+      { kind: 'bul', re: /[A-Za-z_][\w.\-\/]*(?=\s*:(?:\s|$))/y },
+      { kind: 'dec', re: /[&*][A-Za-z_][\w-]*|<<(?=:)/y },
+      NUMBER,
+      { kind: 'txt', re: /[A-Za-z_][\w.\-\/]*/y },
+      { kind: 'op', re: /---|\.\.\.|[-:|>?]+/y },
     ]
   }
   if (lang === 'shell') {

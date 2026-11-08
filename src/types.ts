@@ -1,4 +1,4 @@
-export type Lang = 'python' | 'typescript' | 'javascript' | 'sql' | 'shell'
+export type Lang = 'python' | 'typescript' | 'javascript' | 'sql' | 'yaml' | 'shell'
 
 /** One code example plus an optional one-line explanation. */
 export type Snippet = {
